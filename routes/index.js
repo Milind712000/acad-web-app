@@ -6,6 +6,7 @@ const save2disk = require('../helper/save2disk');
 // const fn = require('express-async-handler');
 
 router.get('/', (req, res) => {
+	// console.log(req.locals);
 	res.send('You\'ve reached the Home Page 0w0');
 });
 
@@ -13,11 +14,11 @@ router.get('/pdfupload', (req, res, next) => {
 	res.render('pdfupload');
 });
 
-router.post('/pdfupload', save2disk.single('course-pdf'), (req, res, next) => {
+router.post('/pdfupload', save2disk.single('pdf-file'), (req, res, next) => {
 	const course = new Courses({
 		'courseCode' : req.body.code,
 		'courseName' : req.body.name,
-		// 'filename' : req.locals.filePath,
+		'filename' : req.locals.filePath,
 		'credit' : req.body.credit,
 		'tags' : req.body.tags
 	});
@@ -32,29 +33,6 @@ router.post('/pdfupload', save2disk.single('course-pdf'), (req, res, next) => {
 		});
 	// TODO also add the id of this course to all groups
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
