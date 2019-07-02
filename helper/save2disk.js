@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 		if(!filePath.endsWith('.pdf'))
 			filePath = filePath + '.pdf';
 
-		filePath = Date.now() + filePath;
+		filePath = Date.now() + '_' + filePath;
 
 		req.locals = req.locals || {};
 		req.locals.filePath = filePath;
@@ -27,8 +27,8 @@ const upload = multer({
 	storage: storage,
 	fileFilter : (req, file, next) => {
 		// only accept pdf files
-		if(file.mimetype.split('/')[1] == 'pdf')
-			next({message : 'Wrong file type : Please upload a pdf file'});
+		if(file.mimetype.split('/')[1] !== 'pdf')
+			return next(new Error('Only pdfs are allowed'));
 		next(null, true);
 	},
 	limits : {
