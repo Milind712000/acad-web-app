@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const index = require('./routes/index');
 const course = require('./routes/course');
 const uploadPortal = require('./routes/uploadPortal');
+const display = require('./routes/display');
 
 // other imports
 const dbConfig = require('./config/dbKeys-local');
@@ -17,7 +18,8 @@ const app = express();
 // connect to database
 mongoose.Promise = global.Promise;
 mongoose.connect(dbConfig.URI, {
-	useNewUrlParser: true
+	useNewUrlParser: true,
+	useFindAndModify: false
 });
 const db = mongoose.connection;
 
@@ -55,6 +57,7 @@ app.use(express.urlencoded({
 app.use('/', index);
 app.use('/course', course);
 app.use('/edit', uploadPortal);
+app.use('/display', display);
 
 // for invalid paths
 app.use((req, res) => {

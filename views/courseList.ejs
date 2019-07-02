@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=2.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+</head>
+<body>
+	<table>
+		<thead>
+			<th>Code</th>
+			<th>Name</th>
+			<th>Credit</th>
+			<th>PDF</th>
+		</thead>
+		<tbody>
+			<% courseList.forEach(function(el, index) { %>
+				<!-- // el - current element, i - index -->
+				<tr>
+					<td><%= el.courseCode %></td>
+					<td><%= el.courseName %></td>
+					<td><%= el.credit %></td>
+					<td><a href="/static/pdf/<%=el.filename%>">pdf file</a></td>
+				</tr>
+			<% }); %>
+		</tbody>
+	</table>
+</body>
+</html>
