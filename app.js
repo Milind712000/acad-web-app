@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 
 // router imports
 const index = require('./routes/index');
+const course = require('./routes/course');
+const uploadPortal = require('./routes/uploadPortal');
 
 // other imports
 const dbConfig = require('./config/dbKeys-local');
@@ -28,6 +30,9 @@ db.once('error', (err) => {
 	console.log(err.message);
 });
 
+// serve static files
+app.use('/static', express.static(path.join(__dirname, 'public')));
+
 // setup template engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -48,6 +53,8 @@ app.use(express.urlencoded({
 
 // routes
 app.use('/', index);
+app.use('/course', course);
+app.use('/edit', uploadPortal);
 
 // for invalid paths
 app.use((req, res) => {
