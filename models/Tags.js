@@ -1,13 +1,52 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
+const Courses = require('./Courses');
+
 const tags = new schema({
-	category : {
+	name : {
 		type : String,
-		required : true
+		required : true,
+		unique : true
 	},
 	courseList : [String]
 });
+
+tags.methods.removeCourseFromTag =async function(courseCode) {
+	let index = this.courseList.indexOf(courseCode);
+	if(index !== -1) // remove if it exists
+		this.courseList.splice(index, 1);
+	await this.save();
+	return this;
+};
+
+tags.methods.addCourseToTag = async function(courseCode) {
+	if(await Courses.doesCourseExist(courseCode)){	// make sure course exists
+		let index = this.courseList.indexOf(courseCode);
+		if(index === -1)	// add if it is not already in the list
+			this.courseList.push(courseCode);
+		await this.save();
+	}
+	return this;
+};
+
+tags.statics.doesTagExist = async (tagName) => {
+	let tag = await Tags.findOne({'name' : tagName});
+	if(tag){
+		return true;
+	}
+	return false;
+};
+
+tags.statics.tagnameList = async () => {
+	let temp = await Tags.find({},'name');
+	let tagList = [];
+	for (let index = 0; index < temp.length; index++) {
+		const tagObj = temp[index];
+		tagList.push(tagObj.name);
+	}
+	return tagList;
+};
 
 const Tags = mongoose.model('Tags', tags);
 

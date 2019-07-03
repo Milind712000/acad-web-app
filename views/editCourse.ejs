@@ -14,28 +14,39 @@
 
 <body>
 	<h1>Hello, world!</h1>
-	<form method="POST" action="<%= ques.courseCode ? '/edit/editCourse' : '/edit/addCourse' %>" enctype="multipart/form-data">
+	<form method="POST" action="<%= course.courseCode ? '/edit/editCourse' : '/edit/addCourse' %>" enctype="multipart/form-data">
 		<label>
 			Course Code
-			<input type="text" name="code" value="<%= ques.courseCode || 'courseCode' %>" <%= ques.filename ? 'readonly' : '' %> required/><br/>
+			<input type="text" name="code" value="<%= course.courseCode || 'courseCode' %>" <%= course.filename ? 'readonly' : '' %> required/><br/>
 		</label>
 		<br>
 		<label>
 			Course Name
-			<input type="text" name="name" value="<%= ques.courseName || 'courseName' %>" required/><br/>
+			<input type="text" name="name" value="<%= course.courseName || 'courseName' %>" required/><br/>
 		</label>
 		<br>
 		<label>
 			Credit
-			<input type="number" name="credit" value="<%= ques.credit || 0 %>" required/><br/>
+			<input type="number" name="credit" value="<%= course.credit || 0 %>" required/><br/>
 		</label>
 		<br>
 		<label>
 			Course Details (PDF)
-			<input type="file" name="pdf-file" <%= ques.filename ? '' : 'required' %> /><br/>
+			<input type="file" name="pdf-file" <%= course.filename ? '' : 'required' %> /><br/>
 		</label>
 		<br>
-		<input type="text" name="_id" value="<%= ques._id || '' %>" hidden>
+		
+		<label>Categories<br>
+			<% tagList.forEach(function(el, index) { %>
+				<!-- // el - current element, i - index -->
+				<label>
+					<input type="checkbox" name="tags" value="<%=el%>" <%= course.tags.indexOf(el) === -1 ? '' : 'checked' %>><%=el%>
+				</label>
+			<% }); %>
+		</label>
+		<br>
+
+		<input type="text" name="_id" value="<%= course._id || '' %>" hidden>
 		<label>
 			<input type="submit" />
 		</label>

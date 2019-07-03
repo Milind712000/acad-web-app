@@ -10,21 +10,16 @@
 	<table>
 		<thead>
 			<th>Code</th>
-			<th>Name</th>
-			<th>Credit</th>
-			<th>PDF</th>
 			<th>Actions</th>
 		</thead>
 		<tbody>
-			<% courseList.forEach(function(el, index) { %>
+			<% tagList.forEach(function(el, index) { %>
 				<!-- // el - current element, i - index -->
 				<tr>
-					<td><%= el.courseCode %></td>
-					<td><%= el.courseName %></td>
-					<td><%= el.credit %></td>
-					<td><a href="/static/pdf/<%=el.filename%>">pdf file</a></td>
+					<td><%= el %></td>
 					<td>
-						<a href="/edit/editCourse?id=<%=el._id%>">Edit</a>
+						<!-- <a href="/edit/editTag?id=<%=el._id%>">Edit</a> -->
+						<!-- A name change of a tag may cause many views to break so only tag adding and deleting should be allowed and not editing of names of old tags-->
 						<a href="#">Delete</a>
 						<!-- TODO add delete route -->
 					</td>
