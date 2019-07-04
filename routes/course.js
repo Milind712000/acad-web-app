@@ -8,8 +8,8 @@ router.get('/:tag', fn(async(req, res) => {
 	if(req.params['tag'] == 'all'){
 		courseList = await Courses.find({});
 	} else {
-		const tag = Tags.findOne({'name':req.params['tag']});
-		if(!tag){
+		const tag = await Tags.findOne({'name':req.params['tag']});
+		if(tag){
 			for (let i = 0; i < tag.courseList.length; i++) {
 				const courseCode = tag.courseList[i];
 				courseList.push(await Courses.findOne({'courseCode' : courseCode}));
