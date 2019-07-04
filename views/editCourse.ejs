@@ -40,7 +40,12 @@
 			<% tagList.forEach(function(el, index) { %>
 				<!-- // el - current element, i - index -->
 				<label>
-					<input type="checkbox" name="tags" value="<%=el%>" <%= course.tags.indexOf(el) === -1 ? '' : 'checked' %>><%=el%>
+					<input type="checkbox" name="tags" value="<%=el%>"
+						<% if(course.tags){ %>
+							<%= course.tags.indexOf(el) === -1 ? '' : 'checked' %>
+						<% } %>
+					>
+					<%=el%>
 				</label>
 			<% }); %>
 		</label>

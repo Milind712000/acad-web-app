@@ -68,6 +68,8 @@ router.post('/editCourse', save2disk.single('pdf-file'), fn(async(req, res, next
 	existing_course.credit = req.body.credit;
 
 	// check if all tags sent exist in database
+	if(!(req.body.tags)) //if req.body.tags is not received
+		req.body.tags = [];
 	if(typeof(req.body.tags) === 'string') // in case only a single checkbox was selected
 		req.body.tags = [req.body.tags];
 	for (let i = 0; i < req.body.tags.length; i++) {
