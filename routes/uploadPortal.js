@@ -3,10 +3,9 @@
 const router = require('express').Router();
 const save2disk = require('../helper/save2disk');
 const fn = require('express-async-handler');
-const fileSystem = require('fs');
 const Courses = require('../models/Courses');
 const Tags = require('../models/Tags');
-
+const removeFile = require('../helper/removeFile');
 
 // courses
 
@@ -35,7 +34,7 @@ router.post('/addCourse', save2disk.single('pdf-file'), fn(async(req, res, next)
 	}
 
 	// check if all tags sent exist in database
-	if(typeof(req.body.tags) === 'string')
+	if(typeof(req.body.tags) === 'string') // in case only a single checkbox was selected
 		req.body.tags = [req.body.tags];
 	for (let i = 0; i < course.tags.length; i++) {
 		const tagName = course.tags[i];
@@ -69,7 +68,7 @@ router.post('/editCourse', save2disk.single('pdf-file'), fn(async(req, res, next
 	existing_course.credit = req.body.credit;
 
 	// check if all tags sent exist in database
-	if(typeof(req.body.tags) === 'string')
+	if(typeof(req.body.tags) === 'string') // in case only a single checkbox was selected
 		req.body.tags = [req.body.tags];
 	for (let i = 0; i < req.body.tags.length; i++) {
 		const tagName = req.body.tags[i];
@@ -85,17 +84,9 @@ router.post('/editCourse', save2disk.single('pdf-file'), fn(async(req, res, next
 	if(req.locals && req.locals.filePath){ //check if a new file has been sent
 		// delete old file
 		const filename = existing_course.filename;
-		fileSystem.unlink('./public/pdf/' + filename, function(err) {
-			if(err && err.code == 'ENOENT') {
-				console.warn(`${filename} doesn't exist, won't remove it.`); // file doens't exist
-			} else if (err) {
-				console.error(`Error occurred while trying to remove file ${filename}`); // other errors, e.g. maybe we don't have enough permission
-			} else {
-				console.info(`removed ${filename}`);
-			}
-		});
+		removeFile('./public/pdf/' + filename);
 
-		existing_course.filename = req.locals.filePath; // update if new file else use existing
+		existing_course.filename = req.locals.filePath; // update new file
 	}
 
 	existing_course.save(); // save changes
@@ -117,6 +108,30 @@ router.post('/editCourse', save2disk.single('pdf-file'), fn(async(req, res, next
 	res.redirect('/display/allCourses');
 }));
 
+router.get('/deleteCourse', fn(async (req, res, next) => {
+	const existing_course = await Courses.findById(req.query['id']);
+	
+	if(!(existing_course)){
+		return next(new Error(`${req.query['id']} does not exist`));
+	}
+
+	// delete pdf
+	removeFile('./public/pdf/' + existing_course.filename);
+
+	// remove course from all tags
+	const tagList = await Tags.tagnameList();
+	for (let i = 0; i < tagList.length; i++) {
+		const tagName = tagList[i];
+		const tag = await Tags.findOne({'name':tagName});
+		await tag.removeCourseFromTag(existing_course.courseCode);
+	}
+
+	existing_course.remove();
+
+	res.redirect('/display/allCourses');
+
+}));
+
 // tags
 router.get('/addTag', (req, res, next) => {
 	res.render('addTag');
@@ -130,6 +145,26 @@ router.post('/addTag', fn(async(req, res, next) => {
 		return next(new Error(`${tag.name} already exists`));
 	}
 	await Tags.create(tag);
+	res.redirect('/display/allTags');
+}));
+
+router.get('/deleteTag', fn(async(req, res, next) => {
+	const existing_tag = await Tags.findOne({'name' : req.query['tagName']});
+	if(!(existing_tag)){
+		return next(new Error(`${req.query['id']} does not exist`));
+	}
+	const courseList = existing_tag.courseList;
+
+	//remove from all courses
+	for (let i = 0; i < courseList.length; i++) {
+		const courseCode = courseList[i];
+		const course = await Courses.findOne({'courseCode' : courseCode});
+		await course.removeTagFromCourse(existing_tag.name);
+	}
+
+	//delete tag
+	existing_tag.remove();
+
 	res.redirect('/display/allTags');
 }));
 
