@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
-const Courses = require('./Courses');
-
 const tags = new schema({
 	name : {
 		type : String,
@@ -21,17 +19,15 @@ tags.methods.removeCourseFromTag =async function(courseCode) {
 };
 
 tags.methods.addCourseToTag = async function(courseCode) {
-	if(await Courses.doesCourseExist(courseCode)){	// make sure course exists
-		let index = this.courseList.indexOf(courseCode);
-		if(index === -1)	// add if it is not already in the list
-			this.courseList.push(courseCode);
-		await this.save();
-	}
+	let index = this.courseList.indexOf(courseCode);
+	if(index === -1)	// add if it is not already in the list
+		this.courseList.push(courseCode);
+	await this.save();
 	return this;
 };
 
 tags.statics.doesTagExist = async (tagName) => {
-	let tag = await Tags.findOne({'name' : tagName});
+	let tag = await Tags.findOne({'name' : tagName}, '_id');
 	if(tag){
 		return true;
 	}

@@ -3,12 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const mongoose = require('mongoose');
-
-// router imports
-const index = require('./routes/index');
-const course = require('./routes/course');
-const uploadPortal = require('./routes/uploadPortal');
-const display = require('./routes/display');
+const fileStorage = require('./helper/storageHelper');
 
 // other imports
 const dbConfig = require('./config/dbKeys-local');
@@ -43,21 +38,28 @@ app.engine('html', require('ejs').renderFile);
 // log all requests
 app.use(morgan('tiny'));
 
+// initialise req and res locals
+app.use((req, res, next) => {
+	req.locals = req.locals || {};
+	res.locals = res.locals || {};
+	next();
+});
+
 // express body-parser
-app.use(express.json({
+app.use(express.json({	// for json data
 	limit: '30MB',
 	extended: true
 }));
-app.use(express.urlencoded({
+app.use(express.urlencoded({ // x-www-form-urlencoded
 	limit: '30MB',
 	extended: true
 }));
+app.use(fileStorage.upload.single('x-file-upload')); // form-data and pdf file uploads (single file with field name x-file-upload)
+
 
 // routes
-app.use('/', index);
-app.use('/course', course);
-app.use('/edit', uploadPortal);
-app.use('/display', display);
+const edit = require('./routes/edit');
+app.use('/', edit);
 
 // for invalid paths
 app.use((req, res) => {
@@ -66,7 +68,10 @@ app.use((req, res) => {
 
 // error handling
 app.use((err, req, res, next) => {
+	// remove unresolved temporary file
+	if(req.locals.filename) fileStorage.delete('./tempFiles/'+req.locals.filename);
 	console.log('ErrorMessage : ',err.message);
+	console.log(err instanceof require('multer').MulterError); // always false in case of filefilter // TODO fix it
 	if (res.headersSent) next(err);
 	res.send('Something Broke !!');
 });

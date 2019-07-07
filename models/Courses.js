@@ -45,7 +45,7 @@ course.methods.addTagToCourse = async function(tagName) {
 };
 
 course.statics.doesCourseExist = async (courseCode) => {
-	let course = await Course.findOne({'courseCode' : courseCode});
+	let course = await Course.findOne({'courseCode' : courseCode}, '_id');
 	if(course)
 		return true;
 	return false;
