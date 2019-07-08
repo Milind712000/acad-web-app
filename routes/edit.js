@@ -118,12 +118,13 @@ router.post('/addCourse',
 	fn(async (req, res, next) => {
 		// check for validation errors
 		const errors = validator.validationResult(req);
-		res.locals.errors = errors;
+		res.locals.errors = errors.errors;
+		
 
 		if(!errors.isEmpty()){
 			//delete file
 			fileStorage.delete('./tempFiles/'+req.locals.filename);
-			return res.send(errors); // TODO res.render('addPageView', {errors : errors})
+			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
 
 			const course = {
@@ -149,7 +150,7 @@ router.post('/addCourse',
 				await tag.addCourseToTag(course.courseCode);
 			}
 
-			return res.send('success'); // TODO res.redirect('allCourses')
+			return res.redirect('/edit/allCourses');
 		}
 	}
 	)
@@ -170,12 +171,13 @@ router.post('/editCourse',
 	fn(async (req, res, next) => {
 		// check for validation errors
 		const errors = validator.validationResult(req);
-		res.locals.errors = errors;
+		res.locals.errors = errors.errors;
+		
 
 		if(!errors.isEmpty()){
 			//delete file
 			fileStorage.delete('./tempFiles/'+req.locals.filename);
-			return res.send(errors); // TODO res.render('addPageView', {errors : errors})
+			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
 			const existing_course = await Courses.findOne({'courseCode' : req.body.code});
 
@@ -215,7 +217,7 @@ router.post('/editCourse',
 				await tag.addCourseToTag(existing_course.courseCode);
 			}
 
-			return res.send('success'); // TODO res.redirect('allCourses')
+			return res.redirect('/edit/allCourses');
 		}
 	})
 );
@@ -226,15 +228,16 @@ router.post('/editCourse',
 	url parameters
 	code -> course code	XY-ABC	(X,Y - letters(upper case)) (A,B,C - digits) (should be already present in database) (required)
 */
-router.delete('/deleteCourse/:code',
+router.post('/deleteCourse/:code',
 	checkOldCourseParam,
 	fn(async (req, res) => {
 		// check for validation errors
 		const errors = validator.validationResult(req);
-		res.locals.errors = errors;
+		res.locals.errors = errors.errors;
+		
 	
 		if(!errors.isEmpty()){
-			return res.send(errors); // TODO res.render('addPageView', {errors : errors})
+			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
 			const existing_course = await Courses.findOne({'courseCode' : req.params.code});
 	
@@ -253,7 +256,49 @@ router.delete('/deleteCourse/:code',
 			// remove course
 			await existing_course.remove();
 				
-			return res.send('success'); // TODO res.redirect('allCourses')
+			return res.redirect('/edit/allCourses');
+		}
+	})
+);
+
+/*
+	get all course page
+*/
+router.get('/allCourses',
+	fn(async (req, res) => {
+		let courseList = await Courses.find({},'-_id');
+		courseList = courseList || [];
+		res.render('allCourses',{'courses':courseList});
+	})
+);
+
+/*
+	get add course page
+*/
+router.get('/addCourse',
+	fn(async (req, res) => {
+		let tagList = await Tags.tagnameList();
+		res.render('addCourse',{'tagList':tagList});
+	})
+);
+
+
+/*
+	get edit course page
+*/
+router.get('/editCourse/:code',
+	checkOldCourseParam,
+	fn(async (req, res) => {
+		// check for validation errors
+		const errors = validator.validationResult(req);
+		res.locals.errors = errors.errors;
+	
+		if(!errors.isEmpty()){
+			return res.render('errors',{ 'backurl': req.headers.referer});
+		} else{
+			let course = await Courses.findOne({'courseCode' : req.params.code});
+			let tagList = await Tags.tagnameList();
+			res.render('editCourse',{'tagList':tagList, 'course':course});
 		}
 	})
 );
@@ -261,7 +306,7 @@ router.delete('/deleteCourse/:code',
 /*
 	get all course objects
 */
-router.get('/allCourse',
+router.get('/allCourseObjects',
 	fn(async (req, res) => {
 		const courseList = await Courses.find({},'-_id');
 		res.send(courseList);
@@ -292,13 +337,14 @@ router.post('/addTag',
 	fn(async(req, res) => {
 		// check for validation errors
 		const errors = validator.validationResult(req);
-		res.locals.errors = errors;
+		res.locals.errors = errors.errors;
+		
 
 		if(!errors.isEmpty()){
-			res.send(errors); // TODO res.render('addPageView', {errors : errors})
+			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
 			await Tags.create({'name': req.body.tagname});
-			res.send('success');	// TODO res.redirect(/"alltags")
+			return res.redirect('/edit/allTags');
 		}
 	})
 );
@@ -308,15 +354,16 @@ router.post('/addTag',
 	url parameters
 	tagname -> tag name (tagname should be present in the database) (required) (2-30 characters) (allowed characters : a-z, A-Z, _, 0-9)
 */
-router.delete('/deleteTag/:tagname',
+router.post('/deleteTag/:tagname',
 	checkOldTag,
 	fn(async (req, res) => {
 		// check for validation errors
 		const errors = validator.validationResult(req);
-		res.locals.errors = errors;
+		res.locals.errors = errors.errors;
+		
 
 		if(!errors.isEmpty()){
-			res.send(errors); // TODO res.render('addPageView', {errors : errors})
+			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
 			const tag = await Tags.findOne({'name': req.params.tagname});
 			const courseList = tag.courseList;
@@ -331,7 +378,7 @@ router.delete('/deleteTag/:tagname',
 			// delete tag
 			tag.remove();
 
-			res.send('success');	// TODO res.redirect(/"alltags")
+			return res.redirect('/edit/allTags');
 		}
 	})
 );
@@ -339,7 +386,7 @@ router.delete('/deleteTag/:tagname',
 /*
 	get all tag objects
 */
-router.get('/allTags',
+router.get('/allTagObjects',
 	fn(async (req, res) => {
 		const taglist = await Tags.find({},'-_id');
 		res.send(taglist);
@@ -357,5 +404,28 @@ router.get('/tag/:tagname',
 		res.send(tag);
 	})
 );
+
+
+/*
+	get all Tags page
+*/
+router.get('/allTags',
+	fn(async (req, res) => {
+		let tagList = await Tags.find({},'-_id');
+		tagList = tagList || [];
+		res.render('allTags',{'tagList':tagList});
+	})
+);
+
+
+/*
+	get add Tags page
+*/
+router.get('/addTag',
+	fn(async (req, res) => {
+		res.render('addTag');
+	})
+);
+
 
 module.exports = router;

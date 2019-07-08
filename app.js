@@ -42,6 +42,7 @@ app.use(morgan('tiny'));
 app.use((req, res, next) => {
 	req.locals = req.locals || {};
 	res.locals = res.locals || {};
+	res.locals.errors = res.locals.errors || [];
 	next();
 });
 
@@ -59,7 +60,7 @@ app.use(fileStorage.upload.single('x-file-upload')); // form-data and pdf file u
 
 // routes
 const edit = require('./routes/edit');
-app.use('/', edit);
+app.use('/edit', edit);
 
 // for invalid paths
 app.use((req, res) => {
@@ -70,10 +71,18 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
 	// remove unresolved temporary file
 	if(req.locals.filename) fileStorage.delete('./tempFiles/'+req.locals.filename);
-	console.log('ErrorMessage : ',err.message);
-	console.log(err instanceof require('multer').MulterError); // always false in case of filefilter // TODO fix it
+	console.log('ErrorMessage : ',err);
+	
+	if(err instanceof require('multer').MulterError) {
+		const errObj = {
+			msg : err.message
+		};
+		res.locals.errors = res.locals.errors || [];
+		res.locals.errors.push(errObj);
+	}
+	
 	if (res.headersSent) next(err);
-	res.send('Something Broke !!');
+	return res.render('errors',{ 'backurl': req.headers.referer});
 });
 
 //listen for requests

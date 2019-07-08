@@ -1,0 +1,35 @@
+<%include ./partials/top.ejs %>
+
+		<table class="table table-responsive table-hover table-bordered">
+			<thead class="thead-dark">
+				<tr>
+					<th>#</th>
+					<th class="text-nowrap">Tag Name</th>
+					<th>Course List</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% tagList.forEach(function(obj, index){ %>
+					<tr>
+							<th><%= index %></th>
+							<td><%= obj.name %></td>
+							<td>
+								<% for(var i=0; i < obj.courseList.length; i++) { %>
+									<span class="badge badge-secondary"> <%= obj.courseList[i] %> </span>
+								<% } %>
+							</td>
+							<td>
+								<form class="form-inline" action="/edit/deleteTag/<%= obj.name %>" method="POST">
+									<input type="submit" disabled aria-hidden="true" hidden>
+									<!-- "disabled first submit button" to disable submit by pressing enter-->
+									<button type="submit" class="btn btn-danger">Delete</button>
+								</form>
+							</td>
+					</tr>
+				<% }); %>
+
+			</tbody>
+		</table>
+
+<%include ./partials/bottom.ejs %>
