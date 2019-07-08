@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const fileStorage = require('./helper/storageHelper');
 
 // other imports
-const dbConfig = require('./config/dbKeys-local');
+const dbConfig = require('./config/dbKeys-atlas');
 
 const app = express();
 
@@ -60,6 +60,11 @@ app.use(fileStorage.upload.single('x-file-upload')); // form-data and pdf file u
 
 // routes
 const edit = require('./routes/edit');
+
+app.get('/', (req, res) => {
+	res.redirect('/edit/allCourses');
+});
+
 app.use('/edit', edit);
 
 // for invalid paths
