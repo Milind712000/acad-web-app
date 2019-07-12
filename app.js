@@ -4,9 +4,12 @@ const morgan = require('morgan');
 const path = require('path');
 const mongoose = require('mongoose');
 const fileStorage = require('./helper/storageHelper');
-
-// other imports
+const passport = require('passport');
+const passportLocal = require('passport-local');
+const session = require('express-session');
+const {ensureAuthenticated} = require('./helper/authHelper');
 const dbConfig = require('./config/dbKeys-local');
+const Users = require('./models/Users');
 
 const app = express();
 
@@ -36,6 +39,10 @@ app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 
 // log all requests
+app.use((req, res, next) => {
+	console.log('========================================================='); //seperate different logs
+	next();
+});
 app.use(morgan('tiny'));
 
 // initialise req and res locals
@@ -48,22 +55,81 @@ app.use((req, res, next) => {
 
 // express body-parser
 app.use(express.json({	// for json data
-	limit: '30MB',
+	limit: '5MB',
 	extended: true
 }));
 app.use(express.urlencoded({ // x-www-form-urlencoded
-	limit: '30MB',
+	limit: '5MB',
 	extended: true
 }));
 app.use(fileStorage.upload.single('x-file-upload')); // form-data and pdf file uploads (single file with field name x-file-upload)
 
 
+// assign sessions to users
+app.use(session({
+	'secret': 'secret, this is',
+	'resave': true,
+	'saveUninitialized': true
+}));
+
+// passport config
+passport.use(new passportLocal.Strategy(
+	{
+		'usernameField': 'username',
+		'passwordField': 'password'
+	},
+	async (username, password, done) => {
+		try {
+			const user = await Users.findOne({username : username});	// TODO add better error handler instead of try except
+			if(!user) {
+				console.log('User not found');
+				done(null, false);
+			} else if(!user.checkPassword(password)) {
+				console.log('wrong password');
+				done(null, false);
+			} else {
+				done(null, user);
+			}
+		} catch (error) {
+			done(error);
+		}
+	}
+));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser( (user, done) => {
+	done(null, user.username);
+});
+
+passport.deserializeUser( (username, done) => {
+	Users.findOne( {username : username}, '-_id admin username')
+		.then( user => {
+			done(null, user);
+		})
+		.catch( err => {
+			done(err);
+		});
+});
+
+// Log the user
+app.use((req, res, next) => {
+	res.locals.user = req.user || null;
+	console.log('USER : ', res.locals.user);
+	next();
+});
+
 // routes
 const edit = require('./routes/edit');
 const fetch = require('./routes/fetch');
+const users = require('./routes/users');
+const index = require('./routes/index');
 
+app.use('/',index);
+app.use('/users', users);
 app.use('/fetch', fetch);
-app.use('/edit', edit);
+app.use('/edit', ensureAuthenticated, edit);
 
 // for invalid paths
 app.use((req, res) => {

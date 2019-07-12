@@ -365,7 +365,7 @@ router.post('/deleteTag/:tagname',
 /*
 	get all Tags page
 */
-router.get('/allTags',
+router.get(['/allTags', '/'],
 	fn(async (req, res) => {
 		let tagList = await Tags.find({},'-_id');
 		tagList = tagList || [];
