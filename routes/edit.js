@@ -56,7 +56,7 @@ const checkCourseInfo = [
 		.toInt(),
 	validator.body('code', 'Invalid Course Code : Course Code must be of format AB-XYZ - (A,B - are letters, X,Y,Z - are digits)')
 		.exists().withMessage('Course Code is compulsory field')
-		.matches(/^[A-Z]{2}-\d{3}$/).withMessage('Course Code must be of format AB-XYZ - (A,B - are letters, X,Y,Z - are digits)'),
+		.matches(/^[A-Z]{2}-\d{3}P?$/).withMessage('Course Code must be of format AB-XYZ or AB-XYZP - (A,B - are letters, X,Y,Z - are digits)'),
 	validator.body('name', 'Invalid Course Name')
 		.exists().withMessage('Course Name is compulsory')
 		.isLength({min:5, max:70}).withMessage('Course Name length must be between 5 to 70 characters'),
@@ -69,8 +69,7 @@ const checkCourseInfo = [
 const checkNewCourse = [
 	validator.body('code')
 		.exists()
-		.custom(uniqueCourseCodeValidator),
-	validator.body('filename', 'course pdf file is compulsory').exists()	// this field is manually added by multer method
+		.custom(uniqueCourseCodeValidator)
 ];
 
 const checkOldCourse = [
@@ -130,16 +129,18 @@ router.post('/addCourse',
 			const course = {
 				'courseCode' : req.body.code,
 				'courseName' : req.body.name,
-				'filename' : req.locals.filename,
+				'filename' : req.locals.filename || '#',
 				'credit' : req.body.credit,
 				'tags' : req.body.tags
 			};
 			
-			// move file to public pdf
-			fileStorage.move('./tempFiles/'+course.filename, './public/pdf/'+course.filename, err => {
-				if(err) next(err);
-			});
-			
+			if(course.filename !== '#'){
+				// move file to public pdf
+				fileStorage.move('./tempFiles/'+course.filename, './public/pdf/'+course.filename, err => {
+					if(err) next(err);
+				});
+			}
+
 			// add course to db
 			await Courses.create(course);
 			

@@ -25,7 +25,11 @@
 									<span class="badge badge-secondary"> <%= obj.tags[i] %> </span>
 								<% } %>
 							</td>
-							<td><a href="/static/pdf/<%= obj.filename %>">pdf file</a></td>
+							<% if(obj.filename !== '#') { %>
+								<td><a href="/static/pdf/<%= obj.filename %>">pdf file</a></td>
+							<% } else { %>
+								<td>No file present</td>
+							<% } %>
 							<td><a href="/edit/editCourse/<%= obj.courseCode %>">edit</a></td>
 					</tr>
 				<% }); %>

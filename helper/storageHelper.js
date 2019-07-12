@@ -19,7 +19,6 @@ const storage = multer.diskStorage({
 		filePath = Date.now() + '_' + filePath;
 
 		req.locals.filename = filePath;
-		req.body.filename = filePath;
 
 		next(null, filePath);
 	}
@@ -79,17 +78,10 @@ const deleteFile = (path) =>{
 	});
 };
 
-// TODO multer error handling not working
+// TODO multer error handling not working for file filter
 
-// const pdfUpload = fn(async(req, res, next) => {
-// 	upload.single('x-file-upload')(req, res, (err) => {
-// 		if(err) res.send(err);
-// 		else next();
-// 	});
-// });
 
 
 module.exports.upload = upload;
 module.exports.move = move;
 module.exports.delete = deleteFile;
-// module.exports.pdfUpload = pdfUpload;
