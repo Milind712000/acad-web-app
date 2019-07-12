@@ -1,5 +1,4 @@
 const fs = require('fs');
-const fn = require('express-async-handler');
 const multer = require('multer');
 
 // multer file upload

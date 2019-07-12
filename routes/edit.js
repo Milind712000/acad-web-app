@@ -303,28 +303,6 @@ router.get('/editCourse/:code',
 	})
 );
 
-/*
-	get all course objects
-*/
-router.get('/allCourseObjects',
-	fn(async (req, res) => {
-		const courseList = await Courses.find({},'-_id');
-		res.send(courseList);
-	})
-);
-
-/*
-	get course object
-	url parameter
-	tagname -> tag name (tagname should be present in the database) (required) (2-30 characters) (allowed characters : a-z, A-Z, _, 0-9)
-*/
-router.get('/course/:code',
-	fn(async (req, res) => {
-		const course = await Courses.findOne({'courseCode':req.params.code},'-_id');
-		res.send(course);
-	})
-);
-
 // ==================================== tags ==========================================
 
 /*
@@ -382,29 +360,6 @@ router.post('/deleteTag/:tagname',
 		}
 	})
 );
-
-/*
-	get all tag objects
-*/
-router.get('/allTagObjects',
-	fn(async (req, res) => {
-		const taglist = await Tags.find({},'-_id');
-		res.send(taglist);
-	})
-);
-
-/*
-	get tag object
-	url parameter
-	tagname -> tag name (tagname should be present in the database) (required) (2-30 characters) (allowed characters : a-z, A-Z, _, 0-9)
-*/
-router.get('/tag/:tagname',
-	fn(async (req, res) => {
-		const tag = await Tags.findOne({'name':req.params.tagname},'-_id');
-		res.send(tag);
-	})
-);
-
 
 /*
 	get all Tags page

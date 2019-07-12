@@ -60,6 +60,9 @@ app.use(fileStorage.upload.single('x-file-upload')); // form-data and pdf file u
 
 // routes
 const edit = require('./routes/edit');
+const fetch = require('./routes/fetch');
+
+app.use('/fetch', fetch);
 app.use('/edit', edit);
 
 // for invalid paths
