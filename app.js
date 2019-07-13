@@ -8,7 +8,7 @@ const passport = require('passport');
 const passportLocal = require('passport-local');
 const session = require('express-session');
 const {ensureAuthenticated} = require('./helper/authHelper');
-const dbConfig = require('./config/dbKeys-local');
+const dbConfig = require('./config/dbKeys-test');
 const Users = require('./models/Users');
 
 const app = express();
