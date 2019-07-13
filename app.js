@@ -45,11 +45,12 @@ app.use((req, res, next) => {
 });
 app.use(morgan('tiny'));
 
-// initialise req and res locals
+// initialise req and res locals to help in rendering
 app.use((req, res, next) => {
 	req.locals = req.locals || {};
 	res.locals = res.locals || {};
 	res.locals.errors = res.locals.errors || [];
+	res.locals.user = res.locals.user || {};
 	next();
 });
 

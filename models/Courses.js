@@ -20,10 +20,13 @@ const course = new schema({
 		type : Number,
 		required : true
 	},
+	ltpc : {
+		type : String,
+		required : true
+	},
 	tags : {
 		type : [String]
 	}
-	// TODO add LTPC
 });
 
 

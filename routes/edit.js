@@ -54,6 +54,8 @@ const checkCourseInfo = [
 		.exists().withMessage('Credit is a required field')
 		.isInt({min:1, max:10}).withMessage('credit must be an integer between 1 and 10')
 		.toInt(),
+	validator.body('ltpc')
+		.exists().withMessage('LTPC is a compulsory field'),
 	validator.body('code', 'Invalid Course Code : Course Code must be of format AB-XYZ - (A,B - are letters, X,Y,Z - are digits)')
 		.exists().withMessage('Course Code is compulsory field')
 		.matches(/^[A-Z]{2}-\d{3}P?$/).withMessage('Course Code must be of format AB-XYZ or AB-XYZP - (A,B - are letters, X,Y,Z - are digits)'),
@@ -107,6 +109,7 @@ const checkOldTag = [
 	request body enctype = multipart/form-data
 	code -> course code	XY-ABC	(X,Y - letters(upper case)) (A,B,C - digits) (required)
 	credit -> integer (1-10) (required)
+	ltpc -> string (required)
 	name -> course name (required) (5-70 characters) (required)
 	tags -> list of tagnames (all tags must be present in the database) (optional)
 	x-file-upload -> attach pdf file (maxSize : 5mb, singlefile, pdf) (required)
@@ -131,6 +134,7 @@ router.post('/addCourse',
 				'courseName' : req.body.name,
 				'filename' : req.locals.filename || '#',
 				'credit' : req.body.credit,
+				'ltpc' : req.body.ltpc,
 				'tags' : req.body.tags
 			};
 			
@@ -162,6 +166,7 @@ router.post('/addCourse',
 	request body enctype = multipart/form-data
 	code -> course code	XY-ABC	(X,Y - letters(upper case)) (A,B,C - digits) (required)
 	credit -> integer (1-10) (required)
+	ltpc -> string (compulsory)
 	name -> course name (required) (5-70 characters) (required)
 	tags -> list of tagnames (all tags must be present in the database) (optional)
 	x-file-upload -> attach pdf file (maxSize : 5mb, singlefile, pdf) (optional)
@@ -185,6 +190,7 @@ router.post('/editCourse',
 			// update course details
 			existing_course.courseName = req.body.name;
 			existing_course.credit = req.body.credit;
+			existing_course.ltpc = req.body.ltpc;
 			existing_course.tags = req.body.tags;
 
 
