@@ -1,3 +1,7 @@
 node_modules/
-public/pdf/
-launch.json
+
+public/pdf/*
+!public/pdf/.keep
+
+tempFiles/*
+!tempFiles/.keep

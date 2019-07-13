@@ -11,3 +11,10 @@ module.exports.forwardAuthenticated = function(req, res, next) {
 	}
 	next();
 };
+
+module.exports.ensureAdmin = function(req, res, next) {
+	if (req.isAuthenticated() && req.locals.user.admin ){
+		return next();
+	}
+	res.redirect('/edit');
+};

@@ -23,6 +23,7 @@ const course = new schema({
 	tags : {
 		type : [String]
 	}
+	// TODO add LTPC
 });
 
 

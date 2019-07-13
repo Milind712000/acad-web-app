@@ -1,0 +1,81 @@
+<%include ./partials/top.ejs %>
+<div class="container shadow mb-5 mt-5">
+	<form action="/users/editUser/<%= username %>" method="POST" class="pb-5 pt-5">
+		<input type="submit" disabled aria-hidden="true" hidden>
+		<!-- "disabled first submit button" to disable submit by pressing enter-->
+
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label">New Password</label>
+			<div class="col-sm-9">
+				<input type="password" name="newPassword" class="form-control" placeholder="a4vVSV4o53FBGa" required>
+			</div>
+		</div>
+
+		<div class="form-group row">
+			<label class="col-sm-3 col-form-label">Repeat Password</label>
+			<div class="col-sm-9">
+				<input type="password" name="newPasswordConfirm" class="form-control" placeholder="ocAVFa43nVEWu"
+					required>
+			</div>
+		</div>
+
+		<div class="form-group row">
+			<div class="col-sm-9">
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+<% if(user.admin) { %>
+<div class="container  shadow mb-5 mt-5">
+	<form action="/users/editUser/<%= username %>" method="POST"  class="pb-5 pt-5">
+		<input type="submit" disabled aria-hidden="true" hidden>
+		<!-- "disabled first submit button" to disable submit by pressing enter-->
+
+		<div class="form-group row">
+			<div class="col-sm-3">Admin Account</div>
+			<div class="col-sm-9">
+				<div class="form-check form-check-inline">
+					<label class="form-check-label">
+						<input class="form-check-input" type="radio" name="admin" value="true"
+							<%= (admin) ? "checked" : "" %>>
+						True
+					</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<label class="form-check-label">
+						<input class="form-check-input" type="radio" name="admin" value="false"
+							<%= (admin) ? "" : "checked" %>>
+						False
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group row">
+			<div class="col-sm-9">
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</div>
+		</div>
+
+	</form>
+</div>
+
+<div class="container  shadow mb-5 mt-5">
+	<form action="/users/deleteUser/<%= username %>" method="POST" class="pb-5 pt-5">
+		<input type="submit" disabled aria-hidden="true" hidden>
+		<!-- "disabled first submit button" to disable submit by pressing enter-->
+
+		<div class="form-group row">
+			<div class="col-sm-9 offset-sm-2">
+				<button type="submit" class="btn btn-danger btn-block">Delete</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<% } %>
+
+<%include ./partials/bottom.ejs %>

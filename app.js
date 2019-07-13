@@ -115,7 +115,8 @@ passport.deserializeUser( (username, done) => {
 
 // Log the user
 app.use((req, res, next) => {
-	res.locals.user = req.user || null;
+	res.locals.user = req.user || {};
+	req.locals.user = req.user || {};
 	console.log('USER : ', res.locals.user);
 	next();
 });
@@ -142,7 +143,9 @@ app.use((err, req, res, next) => {
 	if(req.locals.filename) fileStorage.delete('./tempFiles/'+req.locals.filename);
 	console.log('ErrorMessage : ',err);
 	
-	if(err instanceof require('multer').MulterError) {
+	if (res.headersSent) next(err);
+	
+	if(err instanceof require('multer').MulterError || err.message === 'Only pdfs are allowed') { // multer file filter is does not throw multer error so its been hardcoded
 		const errObj = {
 			msg : err.message
 		};
@@ -150,7 +153,6 @@ app.use((err, req, res, next) => {
 		res.locals.errors.push(errObj);
 	}
 	
-	if (res.headersSent) next(err);
 	return res.render('errors',{ 'backurl': req.headers.referer});
 });
 

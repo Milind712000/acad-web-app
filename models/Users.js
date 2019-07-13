@@ -31,7 +31,7 @@ user.methods.checkPassword = function(password) {
 	}
 };
 
-// TODO virtuals setter for password which hashes the password before storing
+// virtuals setter for password which hashes the password before storing
 user.virtual('_password').set( function (password) {
 	const salt = bcrypt.genSaltSync(saltRounds);
 	this.hashedPassword = bcrypt.hashSync(password, salt);
