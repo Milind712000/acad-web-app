@@ -5,6 +5,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const favicon = require('serve-favicon');
 const compression = require('compression');
+const helmet = require('helmet');
 const fileStorage = require('./helper/storageHelper');
 const passport = require('passport');
 const passportLocal = require('passport-local');
@@ -19,6 +20,8 @@ const app = express();
 app.use(compression());
 // cache and serve favico
 app.use(favicon(path.join(__dirname, 'public', 'fav-ico.png')));
+// protection against common attacks
+app.use(helmet());
 
 // connect to database
 mongoose.Promise = global.Promise;
