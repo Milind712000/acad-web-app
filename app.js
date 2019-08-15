@@ -3,6 +3,8 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const mongoose = require('mongoose');
+const favicon = require('serve-favicon');
+const compression = require('compression');
 const fileStorage = require('./helper/storageHelper');
 const passport = require('passport');
 const passportLocal = require('passport-local');
@@ -12,6 +14,11 @@ const dbConfig = require('./config/dbKeys-test');
 const Users = require('./models/Users');
 
 const app = express();
+
+// compress all responses
+app.use(compression());
+// cache and serve favico
+app.use(favicon(path.join(__dirname, 'public', 'fav-ico.png')));
 
 // connect to database
 mongoose.Promise = global.Promise;
