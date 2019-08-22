@@ -16,10 +16,6 @@ const course = new schema({
 		type : String,
 		required : true
 	},
-	credit : {
-		type : Number,
-		required : true
-	},
 	ltpc : {
 		type : String,
 		required : true
