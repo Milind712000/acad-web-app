@@ -70,10 +70,30 @@ const checkNewCourse = [
 		.custom(uniqueCourseCodeValidator)
 ];
 
-const checkOldCourse = [
-	validator.body('code')
+// check old course for updating
+const checkOldCourseUpdate = [
+	validator.body('objID')
 		.exists()
-		.custom(existingCourseCodeValidator)
+		.custom(async (objID, {req}) => {
+			const targetCourse = await Courses.findById(objID);
+			if(!targetCourse){
+				throw (new Error('Course Object ID is invalid'));
+			}
+			if(!req.body.code){
+				throw (new Error('Course Code is compulsory'));
+			}
+			const codeCourse = await Courses.findOne({'courseCode' : req.body.code});
+			if(codeCourse){
+				// a course with same code already exists or the course code hasn't been changed
+				if(codeCourse.id === objID) {
+					// course code hasn't been changed
+					return true;
+				} else {
+					//another course with the same name exists
+					throw (new Error('Course Code already in use'));
+				}
+			}
+		})
 ];
 
 const checkOldCourseParam = [
@@ -165,7 +185,7 @@ router.post('/addCourse',
 	x-file-upload -> attach pdf file (maxSize : 5mb, singlefile, pdf) (optional)
 */
 router.post('/editCourse',
-	checkOldCourse,
+	checkOldCourseUpdate,
 	checkCourseInfo,
 	fn(async (req, res, next) => {
 		// check for validation errors
@@ -178,9 +198,11 @@ router.post('/editCourse',
 			fileStorage.delete('./tempFiles/'+req.locals.filename);
 			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
-			const existing_course = await Courses.findOne({'courseCode' : req.body.code});
+			const existing_course = await Courses.findById(req.body.objID);
+			const oldCourseCode = existing_course.courseCode;
 
 			// update course details
+			existing_course.courseCode = req.body.code;
 			existing_course.courseName = req.body.name;
 			existing_course.ltpc = req.body.ltpc;
 			existing_course.tags = req.body.tags;
@@ -207,7 +229,7 @@ router.post('/editCourse',
 			for (let i = 0; i < tagList.length; i++) {
 				const tagName = tagList[i];
 				const tag = await Tags.findOne({'name':tagName});
-				await tag.removeCourseFromTag(existing_course.courseCode);
+				await tag.removeCourseFromTag(oldCourseCode);
 			}
 			// add course to new tags
 			for (let i = 0; i < req.body.tags.length; i++) {

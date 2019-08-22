@@ -3,14 +3,16 @@
 		<form action="/edit/editCourse" method="POST" enctype="multipart/form-data">
 			<input type="submit" disabled aria-hidden="true" hidden>
 			<!-- "disabled first submit button" to disable submit by pressing enter-->
-			
+
+			<input type="text" name="objID" value="<%= course._id %>" hidden aria-hidden="true">
+
 			<div class="form-group row">
 				<label class="col-sm-3 col-form-label">Course Code</label>
 				<div class="col-sm-9">
-					<input type="text" name="code" class="form-control" value="<%= course.courseCode %>" readonly required>
+					<input type="text" name="code" class="form-control" value="<%= course.courseCode %>" required>
 				</div>
 			</div>
-			
+
 			<div class="form-group row">
 				<label class="col-sm-3 col-form-label">Course Name</label>
 				<div class="col-sm-9">

@@ -5,7 +5,6 @@ const Tags = require('./Tags');
 const course = new schema({
 	courseCode : {
 		type : String,
-		unique : true,
 		required : true
 	},
 	courseName : {
