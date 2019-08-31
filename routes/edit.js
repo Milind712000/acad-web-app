@@ -5,6 +5,7 @@ const validator = require('express-validator');
 const fileStorage = require('../helper/storageHelper');
 const Courses = require('../models/Courses');
 const Tags = require('../models/Tags');
+const Archive = require('../models/Archive');
 
 //helper functions
 const uniqueCourseCodeValidator = async (courseCode) => {
@@ -96,6 +97,17 @@ const checkOldCourseUpdate = [
 		})
 ];
 
+const checkOldArchive = [
+	validator.body('objID')
+		.exists()
+		.custom(async (objID) => {
+			const target = await Archive.findById(objID);
+			if(!target) {
+				throw (new Error('Archived file not found for this ID'));
+			} else return true;
+		})
+];
+
 const checkOldCourseParam = [
 	validator.param('code')
 		.exists()
@@ -116,6 +128,11 @@ const checkOldTag = [
 		.custom(existingTagValidator)
 ];
 
+const checkArchive = [
+	validator.body('title')
+		.exists().withMessage('Title of file is compulsory')
+		.isLength({min:5, max :300}).withMessage('The lenght of title must be 5 to 300 characters')
+];
 //routes
 
 // ==================================== courses ==========================================
@@ -403,5 +420,90 @@ router.get('/addTag',
 	})
 );
 
+// ==================================== archives ==========================================
+
+/*
+	add archive to database
+	request body enctype = multipart/form-data
+	title -> file title	string (5 - 300)characters
+	x-file-upload -> attach pdf file (maxSize : 5mb, singlefile, pdf) (required)
+*/
+router.post('/addArchive',
+	checkArchive,
+	fn(async (req, res, next) => {
+		// check for validation errors
+		const errors = validator.validationResult(req);
+		res.locals.errors = errors.errors;
+		
+		if(!errors.isEmpty()){
+			//delete file
+			fileStorage.delete('./tempFiles/'+req.locals.filename);
+			return res.render('errors',{ 'backurl': req.headers.referer});
+		} else {
+
+			const archive = {
+				'title' : req.body.title,
+				'filename' : req.locals.filename || '#'
+			};
+			
+			if(archive.filename !== '#'){
+				// move file to public pdf
+				fileStorage.move('./tempFiles/'+archive.filename, './public/pdf/'+archive.filename, err => {
+					if(err) next(err);
+				});
+			}
+
+			// add archive to db
+			await Archive.create(archive);
+
+			return res.redirect('/edit/allArchives');
+		}
+	}
+	)
+);
+
+/*
+	delete course from database
+	req body
+	objID -> mongoose object of archive file
+*/
+router.post('/deleteArchive',
+	checkOldArchive,
+	fn(async (req, res) => {
+		// check for validation errors
+		const errors = validator.validationResult(req);
+		res.locals.errors = errors.errors;
+		
+		if(!errors.isEmpty()){
+			return res.render('errors',{ 'backurl': req.headers.referer});
+		} else {
+			const existing_archive = await Archive.findById(req.body.objID);
+
+			// delete old file
+			fileStorage.delete('./public/pdf/' + existing_archive.filename);
+
+			// remove course
+			await existing_archive.remove();
+				
+			return res.redirect('/edit/allArchives');
+		}
+	})
+);
+
+/**
+ * Get All Archive Page
+ */
+router.get('/allArchives', fn(async (req, res) => {
+	let archiveList = await Archive.find({});
+	archiveList = archiveList || [];
+	res.render('allArchive',{'archives':archiveList});
+}));
+
+/**
+ * Get add archive page
+ */
+router.get('/addArchive', fn(async(req, res) => {
+	res.render('addArchive');
+}));
 
 module.exports = router;

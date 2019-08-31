@@ -13,7 +13,9 @@ const session = require('express-session');
 const {ensureAuthenticated} = require('./helper/authHelper');
 const dbConfig = require('./config/dbKeys-test');
 const Users = require('./models/Users');
+const dotenv = require('dotenv');
 
+dotenv.config();
 const app = express();
 
 // compress all responses

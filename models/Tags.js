@@ -7,7 +7,7 @@ const tags = new schema({
 		required : true,
 		unique : true
 	},
-	courseList : [String]
+	courseList : [String] // list of course codes
 });
 
 tags.methods.removeCourseFromTag =async function(courseCode) {

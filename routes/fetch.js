@@ -2,6 +2,7 @@ const router = require('express').Router();
 const fn = require('express-async-handler');
 const Courses = require('../models/Courses');
 const Tags = require('../models/Tags');
+const Archive = require('../models/Archive');
 
 // ================================ courses =================================
 
@@ -66,7 +67,12 @@ router.get('/tag/:tagname',
 	})
 );
 
+// ==================================== archives ==========================================
 
+router.get('/allArchives', fn(async (req, res) => {
+	const archives = await Archive.find({},'-_id');
+	res.send(archives);
+}));
 
 
 module.exports = router;

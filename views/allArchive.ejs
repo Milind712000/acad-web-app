@@ -1,0 +1,39 @@
+<%include ./partials/top.ejs %>
+	<div class="table-responsive">
+		<table class="table table-hover table-bordered">
+			<thead class="thead-dark">
+				<tr>
+					<th>#</th>
+					<th class="text-nowrap">Title</th>
+					<th>Document</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<% archives.forEach(function(obj, index){ %>
+					<tr>
+							<th><%= index %></th>
+							<td><%= obj.title %></td>
+							<td>
+							<% if(obj.filename !== '#') { %>
+								<a href="/static/pdf/<%= obj.filename %>">pdf file</a>
+							<% } else { %>
+								No file present
+							<% } %>
+							</td>
+							<td>
+								<form class="form-inline" action="/edit/deleteArchive" method="POST">
+									<input type="submit" disabled aria-hidden="true" hidden>
+									<!-- "disabled first submit button" to disable submit by pressing enter-->
+									<input type="text" value="<%= obj._id%>" name="objID" hidden>
+									<button type="submit" class="btn btn-danger">Delete</button>
+								</form>
+							</td>
+					</tr>
+				<% }); %>
+
+			</tbody>
+		</table>
+	</div>
+<%include ./partials/bottom.ejs %>
