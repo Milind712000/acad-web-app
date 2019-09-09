@@ -24,22 +24,37 @@
 		<div class="collapse navbar-collapse" id="navbarCollapse">
 			<ul class="navbar-nav ml-auto">
 				<li class="nav-item">
-					<a class="nav-link" href="/edit/allCourses">All Courses</a>
+					<div class="dropdown">
+						<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Course
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="/edit/allCourses">All Courses</a>
+						<a class="dropdown-item" href="/edit/addCourse">Add Course</a>
+						</div>
+					</div>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="/edit/allTags">All Tags</a>
+					<div class="dropdown">
+						<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Tags
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="/edit/allTags">All Tags</a>
+						<a class="dropdown-item" href="/edit/addTag">Add Tag</a>
+						</div>
+					</div>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="/edit/addCourse">Add Course</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="/edit/addTag">Add Tag</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="/edit/allArchives">View Archive</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="/edit/addArchive">Add to Archive</a>
+					<div class="dropdown">
+						<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Archive
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="/edit/allArchives">View Archive</a>
+						<a class="dropdown-item" href="/edit/addArchive">Add to Archive</a>
+						</div>
+					</div>
 				</li>
 				<li class="nav-item">
 					<% if(user.username) { %>

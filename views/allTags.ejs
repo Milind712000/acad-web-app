@@ -7,6 +7,7 @@
 					<th class="text-nowrap">Tag Name</th>
 					<th>Course List</th>
 					<th>Action</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -25,6 +26,9 @@
 									<!-- "disabled first submit button" to disable submit by pressing enter-->
 									<button type="submit" class="btn btn-danger">Delete</button>
 								</form>
+							</td>
+							<td>
+								<a href="/edit/editTag/<%= obj.name %>">edit</a>
 							</td>
 					</tr>
 				<% }); %>

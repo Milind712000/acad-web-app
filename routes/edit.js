@@ -49,6 +49,20 @@ const tagValidator = async (tagArray) => {
 	return true;
 };
 
+const removeDuplicateCourseCodes = (courseCodeArray) => {
+	return Array.from(new Set(courseCodeArray));
+};
+
+const courseListValidator = async (courseCodeArray) => {
+	for (let i = 0; i < courseCodeArray.length; i++) {
+		const courseCode = courseCodeArray[i];
+		if(!(await Courses.doesCourseExist(courseCode)))
+			throw (new Error(`courseCode : ${courseCode} not found`));
+		
+	}
+};
+
+
 //validators
 const checkCourseInfo = [
 	validator.body('ltpc')
@@ -97,6 +111,32 @@ const checkOldCourseUpdate = [
 		})
 ];
 
+const checkOldTagUpdate = [
+	validator.body('objID')
+		.exists()
+		.custom(async (objID, {req}) => {
+			const targetTag = await Tags.findById(objID);
+			if(!targetTag){
+				throw (new Error('Tag Object ID is invalid'));
+			}
+			if(!req.body.name){
+				throw (new Error('TagName is compulsory'));
+			}
+			const tagname = await Tags.findOne({'name' : req.body.name});
+			if(tagname){
+				// a Tag with same code already exists or the Tag code hasn't been changed
+				if(tagname.id === objID) {
+					// Tag code hasn't been changed
+					return true;
+				} else {
+					//another Tag with the same name exists
+					throw (new Error('Tag name already in use'));
+				}
+			}
+			return true;
+		})
+];
+
 const checkOldArchive = [
 	validator.body('objID')
 		.exists()
@@ -132,6 +172,13 @@ const checkArchive = [
 	validator.body('title')
 		.exists().withMessage('Title of file is compulsory')
 		.isLength({min:5, max :300}).withMessage('The lenght of title must be 5 to 300 characters')
+];
+
+const checkCourseList = [
+	validator.body('courseList','Invalid courseCodes : It must be an array of allowed courseCodes')
+		.toArray()
+		.customSanitizer(removeDuplicateCourseCodes)
+		.custom(courseListValidator)
 ];
 //routes
 
@@ -350,6 +397,7 @@ router.get('/editCourse/:code',
 */
 router.post('/addTag',
 	checkNewTag,
+	checkCourseList,
 	fn(async(req, res) => {
 		// check for validation errors
 		const errors = validator.validationResult(req);
@@ -359,7 +407,21 @@ router.post('/addTag',
 		if(!errors.isEmpty()){
 			return res.render('errors',{ 'backurl': req.headers.referer});
 		} else {
-			await Tags.create({'name': req.body.tagname});
+			const tag = {
+				'name' : req.body.tagname,
+				'courseList' : req.body.courseList
+			};
+
+			await Tags.create(tag);
+
+			// add tag to courses
+			console.log(req.body);
+			for (let i = 0; i < req.body.courseList.length; i++) {
+				const courseCode = req.body.courseList[i];
+				const course = await Courses.findOne({'courseCode':courseCode});
+				await course.addTagToCourse(tag.name);
+			}
+
 			return res.redirect('/edit/allTags');
 		}
 	})
@@ -416,7 +478,84 @@ router.get(['/allTags', '/'],
 */
 router.get('/addTag',
 	fn(async (req, res) => {
-		res.render('addTag');
+		let courseList = await Courses.find({});
+		courseList = courseList.map((obj) => {
+			return obj.courseCode;
+		});
+		res.render('addTag', {courseList});
+	})
+);
+
+
+/*
+	edit tag in database
+	request body enctype = json or url encoded
+	name -> tag name (tagname should be present in the database) (required) (2-30 characters) (allowed characters : a-z, A-Z, _, 0-9)
+	courseList -> list of courseCodes (all tags must be present in the database) (optional)
+*/
+router.post('/editTag',
+	checkOldTagUpdate,
+	checkCourseList,
+	fn(async (req, res) => {
+		// check for validation errors
+		const errors = validator.validationResult(req);
+		res.locals.errors = errors.errors;
+
+		if(!errors.isEmpty()){
+			//delete file
+			fileStorage.delete('./tempFiles/'+req.locals.filename);
+			return res.render('errors',{ 'backurl': req.headers.referer});
+		} else {
+			const existing_tag = await Tags.findById(req.body.objID);
+			const oldTagName = existing_tag.name;
+
+			// update course details
+			existing_tag.name = req.body.name;
+			existing_tag.courseList = req.body.courseList;
+
+			// save changes to course
+			await existing_tag.save();
+
+			//update tagname in all courses
+			let courseList = await Courses.find({});
+			courseList = courseList.map((obj) => {
+				return obj.courseCode;
+			});
+			for (let i = 0; i < courseList.length; i++) {
+				const courseCode = courseList[i];
+				const course = await Courses.findOne({'courseCode':courseCode});
+				await course.removeTagFromCourse(oldTagName);
+				if(req.body.courseList.indexOf(course.courseCode) !== -1){
+					await course.addTagToCourse(existing_tag.name);
+				}
+			}
+
+			return res.redirect('/edit/allTags');
+		}
+	})
+);
+
+
+/*
+	get edit course page
+*/
+router.get('/editTag/:tagname',
+	checkOldTag,
+	fn(async (req, res) => {
+		// check for validation errors
+		const errors = validator.validationResult(req);
+		res.locals.errors = errors.errors;
+	
+		if(!errors.isEmpty()){
+			return res.render('errors',{ 'backurl': req.headers.referer});
+		} else{
+			const tag = await Tags.findOne({'name': req.params.tagname});
+			let courseList = await Courses.find({}, 'courseCode');
+			courseList = courseList.map((obj) => {
+				return obj.courseCode;
+			});
+			return res.render('editTag', {'tag' : tag, 'courseList' : courseList});
+		}
 	})
 );
 
