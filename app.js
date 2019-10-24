@@ -14,12 +14,17 @@ const {ensureAuthenticated} = require('./helper/authHelper');
 const dbConfig = require('./config/dbKeys-test');
 const Users = require('./models/Users');
 const dotenv = require('dotenv');
+const {ncache} = require('./helper/cacheHelper');
 
 dotenv.config();
 const app = express();
 
 // compress all responses
-app.use(compression());
+// else nginx can do the compression
+if(process.env.compress_internally){
+	app.use(compression());
+}
+
 // cache and serve favico
 app.use(favicon(path.join(__dirname, 'public', 'fav-ico.png')));
 // protection against common attacks
@@ -152,6 +157,7 @@ app.use((req, res) => {
 
 // error handling
 app.use((err, req, res, next) => {
+	
 	// remove unresolved temporary file
 	if(req.locals.filename) fileStorage.delete('./tempFiles/'+req.locals.filename);
 	console.log('ErrorMessage : ',err);
@@ -166,7 +172,13 @@ app.use((err, req, res, next) => {
 		res.locals.errors.push(errObj);
 	}
 	
-	return res.render('errors',{ 'backurl': req.headers.referer});
+	res.render('errors',{ 'backurl': req.headers.referer});
+	
+	// clear the cache after sending the response
+	// this has to be done after the respose is sent as my cache module automatically caches the response
+	// and in this case it cached the error as an actual response
+	ncache.flushAll();
+	return;
 });
 
 //listen for requests

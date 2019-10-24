@@ -6,6 +6,7 @@ const fileStorage = require('../helper/storageHelper');
 const Courses = require('../models/Courses');
 const Tags = require('../models/Tags');
 const Archive = require('../models/Archive');
+const {ncache} = require('../helper/cacheHelper');
 
 //helper functions
 const uniqueCourseCodeValidator = async (courseCode) => {
@@ -233,6 +234,7 @@ router.post('/addCourse',
 				await tag.addCourseToTag(course.courseCode);
 			}
 
+			ncache.flushAll();
 			return res.redirect('/edit/allCourses');
 		}
 	}
@@ -302,6 +304,7 @@ router.post('/editCourse',
 				await tag.addCourseToTag(existing_course.courseCode);
 			}
 
+			ncache.flushAll();
 			return res.redirect('/edit/allCourses');
 		}
 	})
@@ -340,7 +343,8 @@ router.post('/deleteCourse/:code',
 			
 			// remove course
 			await existing_course.remove();
-				
+			
+			ncache.flushAll();
 			return res.redirect('/edit/allCourses');
 		}
 	})
@@ -421,7 +425,7 @@ router.post('/addTag',
 				const course = await Courses.findOne({'courseCode':courseCode});
 				await course.addTagToCourse(tag.name);
 			}
-
+			ncache.flushAll();
 			return res.redirect('/edit/allTags');
 		}
 	})
@@ -455,7 +459,7 @@ router.post('/deleteTag/:tagname',
 
 			// delete tag
 			tag.remove();
-
+			ncache.flushAll();
 			return res.redirect('/edit/allTags');
 		}
 	})
@@ -529,7 +533,7 @@ router.post('/editTag',
 					await course.addTagToCourse(existing_tag.name);
 				}
 			}
-
+			ncache.flushAll();
 			return res.redirect('/edit/allTags');
 		}
 	})
@@ -594,7 +598,7 @@ router.post('/addArchive',
 
 			// add archive to db
 			await Archive.create(archive);
-
+			ncache.flushAll();
 			return res.redirect('/edit/allArchives');
 		}
 	}
@@ -623,7 +627,8 @@ router.post('/deleteArchive',
 
 			// remove course
 			await existing_archive.remove();
-				
+			
+			ncache.flushAll();
 			return res.redirect('/edit/allArchives');
 		}
 	})

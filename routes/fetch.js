@@ -3,6 +3,7 @@ const fn = require('express-async-handler');
 const Courses = require('../models/Courses');
 const Tags = require('../models/Tags');
 const Archive = require('../models/Archive');
+const {cacheThis} = require('../helper/cacheHelper');
 
 // ================================ courses =================================
 
@@ -10,6 +11,7 @@ const Archive = require('../models/Archive');
 	get all course objects
 */
 router.get('/allCourseObjects',
+	cacheThis,
 	fn(async (req, res) => {
 		const courseList = await Courses.find({},'-_id');
 		res.send(courseList);
@@ -22,6 +24,7 @@ router.get('/allCourseObjects',
 	tagname -> tag name (tagname should be present in the database) (required) (2-30 characters) (allowed characters : a-z, A-Z, _, 0-9)
 */
 router.get('/course/:code',
+	cacheThis,
 	fn(async (req, res) => {
 		let course = await Courses.findOne({'courseCode':req.params.code},'-_id');
 		course = course || {};
@@ -33,6 +36,7 @@ router.get('/course/:code',
 	get all objects with a certain tag
 */
 router.get('/taggedCourses/:tagname',
+	cacheThis,
 	fn(async (req, res) => {
 		const courses = await Courses.find({'tags':req.params.tagname},'-_id');
 		res.send(courses);
@@ -48,6 +52,7 @@ router.get('/taggedCourses/:tagname',
 	get all tag objects
 */
 router.get('/allTagObjects',
+	cacheThis,
 	fn(async (req, res) => {
 		const taglist = await Tags.find({},'-_id');
 		res.send(taglist);
@@ -60,6 +65,7 @@ router.get('/allTagObjects',
 	tagname -> tag name (tagname should be present in the database) (required) (2-30 characters) (allowed characters : a-z, A-Z, _, 0-9)
 */
 router.get('/tag/:tagname',
+	cacheThis,
 	fn(async (req, res) => {
 		let tag = await Tags.findOne({'name':req.params.tagname},'-_id');
 		tag = tag || {};
@@ -69,10 +75,13 @@ router.get('/tag/:tagname',
 
 // ==================================== archives ==========================================
 
-router.get('/allArchives', fn(async (req, res) => {
-	const archives = await Archive.find({},'-_id');
-	res.send(archives);
-}));
+router.get('/allArchives', 
+	cacheThis,
+	fn(async (req, res) => {
+		const archives = await Archive.find({},'-_id');
+		res.send(archives);
+	})
+);
 
 
 module.exports = router;
