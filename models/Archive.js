@@ -6,6 +6,10 @@ const archive = new schema({
 		type : String,
 		required : true
 	},
+	category : {
+		type : String, // [other, calendar, courseList, something]
+		required : true
+	},
 	filename : {					// name of pdf-file in public/pdf/
 		type : String,
 		required : true

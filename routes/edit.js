@@ -63,17 +63,23 @@ const courseListValidator = async (courseCodeArray) => {
 	}
 };
 
+const archiveCategoryValidator = (cat) => {
+	if(cat !== 'calendar' && cat !== 'other' && cat !== 'timetable' && cat !== 'courselist'){
+		throw (new Error(`Category : ${cat} is invalid`));
+	}
+	return true;
+};
 
 //validators
 const checkCourseInfo = [
 	validator.body('ltpc')
 		.exists().withMessage('LTPC is a compulsory field'),
-	validator.body('code', 'Invalid Course Code : Course Code must be of format AB-XYZ - (A,B - are letters, X,Y,Z - are digits)')
-		.exists().withMessage('Course Code is compulsory field')
-		.matches(/^[A-Z]{2}-\d{3}P?$/).withMessage('Course Code must be of format AB-XYZ or AB-XYZP - (A,B - are letters, X,Y,Z - are digits)'),
+	validator.body('code', 'Invalid Course Code : Course Code is compulsory )')
+		.exists().withMessage('Course Code is compulsory field'),
+	// .matches(/^[A-Z]{2}-\d{3}P?$/).withMessage('Course Code must be of format AB-XYZ or AB-XYZP - (A,B - are letters, X,Y,Z - are digits)'),
 	validator.body('name', 'Invalid Course Name')
 		.exists().withMessage('Course Name is compulsory')
-		.isLength({min:5, max:70}).withMessage('Course Name length must be between 5 to 70 characters'),
+		.isLength({min:5, max:1000}).withMessage('Course Name length must be between 5 to 1000 characters'),
 	validator.body('tags','Invalid tags : It must be an array of allowed tagnames')
 		.toArray()
 		.customSanitizer(removeDuplicateTags)
@@ -172,7 +178,11 @@ const checkOldTag = [
 const checkArchive = [
 	validator.body('title')
 		.exists().withMessage('Title of file is compulsory')
-		.isLength({min:5, max :300}).withMessage('The lenght of title must be 5 to 300 characters')
+		.isLength({min:5, max :300}).withMessage('The lenght of title must be 5 to 300 characters'),
+	validator.body('category')
+		.exists().withMessage('Category is compulsory')
+		.isString().withMessage('Invalid type received for string : category must be a string')
+		.custom(archiveCategoryValidator)
 ];
 
 const checkCourseList = [
@@ -322,7 +332,7 @@ router.post('/deleteCourse/:code',
 		// check for validation errors
 		const errors = validator.validationResult(req);
 		res.locals.errors = errors.errors;
-		
+
 	
 		if(!errors.isEmpty()){
 			return res.render('errors',{ 'backurl': req.headers.referer});
@@ -586,6 +596,7 @@ router.post('/addArchive',
 
 			const archive = {
 				'title' : req.body.title,
+				'category' : req.body.category,
 				'filename' : req.locals.filename || '#'
 			};
 			
