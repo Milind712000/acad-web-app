@@ -1,10 +1,17 @@
 <%include ./partials/pre-top.ejs %>
+
+<link rel="stylesheet" href="/static/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/static/css/dataTables.bootstrap4.min.css">
+<script src="/static/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/js/allCourse.js"></script>
+
 <%include ./partials/top.ejs %>
 	<div class="table-responsive">
-		<table class="table table-hover table-bordered">
+		<table class="dataTable table table-hover table-striped table-bordered">
 			<thead class="thead-dark">
 				<tr>
-					<th>#</th>
+					<th></th>
 					<th class="text-nowrap">Title</th>
 					<th>Category</th>
 					<th>Document</th>
@@ -15,12 +22,22 @@
 
 				<% archives.forEach(function(obj, index){ %>
 					<tr>
-							<th><%= index + 1 %></th>
+							<th></th>
 							<td><%= obj.title %></td>
-							<td><%= obj.category %></td>
+							<td>
+								<% if(obj.category === 'other') { %>
+									<span class="badge badge-secondary"> OTHER </span>
+									<% } else if (obj.category === 'timetable') { %>
+										<span class="badge badge-warning"> TIME TABLE </span>
+									<% } else if (obj.category === 'courselist') { %>
+										<span class="badge badge-success"> COURSE LIST </span>
+									<% } else { %>
+										<span class="badge badge-info"> CALENDAR </span>
+								<% } %>
+							</td>
 							<td>
 							<% if(obj.filename !== '#') { %>
-								<a href="/static/pdf/<%= obj.filename %>">pdf file</a>
+								<a class="btn btn-info btn-sm" href="/static/pdf/<%= obj.filename %>" role="button">PDF</a>
 							<% } else { %>
 								No file present
 							<% } %>
@@ -30,7 +47,7 @@
 									<input type="submit" disabled aria-hidden="true" hidden>
 									<!-- "disabled first submit button" to disable submit by pressing enter-->
 									<input type="text" value="<%= obj._id%>" name="objID" hidden>
-									<button type="submit" class="btn btn-danger">Delete</button>
+									<button type="submit" class="btn btn-danger btn-sm">Delete</button>
 								</form>
 							</td>
 					</tr>

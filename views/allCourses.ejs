@@ -1,14 +1,17 @@
 <%include ./partials/pre-top.ejs %>
 
 <link rel="stylesheet" href="/static/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/static/css/dataTables.bootstrap4.min.css">
 <script src="/static/js/jquery.dataTables.min.js"></script>
-<script src="/static/js/index.js"></script>
+<script src="/static/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/js/allCourse.js"></script>
 
 <%include ./partials/top.ejs %>
 	<div class="table-responsive">
-		<table class="table table-hover table-bordered">
+		<table class="dataTable table table-hover table-striped table-bordered">
 			<thead class="thead-dark">
 				<tr>
+					<th></th>
 					<th class="text-nowrap">Course Code</th>
 					<th>Name</th>
 					<th style="min-width: 15ch;">LTPC </th>
@@ -21,6 +24,7 @@
 
 				<% courses.forEach(function(obj, index){ %>
 					<tr>
+						<td></td>
 						<td><%= obj.courseCode %></td>
 						<td><%= obj.courseName%></td>
 						<td><%= obj.ltpc %></td>
@@ -31,12 +35,14 @@
 						</td>
 						<td>
 						<% if(obj.filename !== '#') { %>
-							<a href="/static/pdf/<%= obj.filename %>">pdf file</a>
+							<a href="/static/pdf/<%= obj.filename %>" class="btn btn-info btn-sm" role="button">PDF</a>
 						<% } else { %>
 							No file present
 						<% } %>
 						</td>
-						<td><a href="/edit/editCourse/<%= obj.courseCode %>">edit</a></td>
+						<td>
+							<a href="/edit/editCourse/<%= obj.courseCode %>" class="btn btn-primary btn-sm" role="button">edit</a>
+						</td>
 					</tr>
 				<% }); %>
 
