@@ -1,9 +1,14 @@
+<%include ./partials/pre-top.ejs %>
+
+<link rel="stylesheet" href="/static/css/jquery.dataTables.min.css">
+<script src="/static/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/index.js"></script>
+
 <%include ./partials/top.ejs %>
 	<div class="table-responsive">
 		<table class="table table-hover table-bordered">
 			<thead class="thead-dark">
 				<tr>
-					<th>#</th>
 					<th class="text-nowrap">Course Code</th>
 					<th>Name</th>
 					<th style="min-width: 15ch;">LTPC </th>
@@ -16,23 +21,22 @@
 
 				<% courses.forEach(function(obj, index){ %>
 					<tr>
-							<th><%= index + 1 %></th>
-							<td><%= obj.courseCode %></td>
-							<td><%= obj.courseName%></td>
-							<td><%= obj.ltpc %></td>
-							<td>
-								<% for(var i=0; i < obj.tags.length; i++) { %>
-									<span class="badge badge-secondary"> <%= obj.tags[i] %> </span>
-								<% } %>
-							</td>
-							<td>
-							<% if(obj.filename !== '#') { %>
-								<a href="/static/pdf/<%= obj.filename %>">pdf file</a>
-							<% } else { %>
-								No file present
+						<td><%= obj.courseCode %></td>
+						<td><%= obj.courseName%></td>
+						<td><%= obj.ltpc %></td>
+						<td>
+							<% for(var i=0; i < obj.tags.length; i++) { %>
+								<span class="badge badge-secondary"> <%= obj.tags[i] %> </span>
 							<% } %>
-							</td>
-							<td><a href="/edit/editCourse/<%= obj.courseCode %>">edit</a></td>
+						</td>
+						<td>
+						<% if(obj.filename !== '#') { %>
+							<a href="/static/pdf/<%= obj.filename %>">pdf file</a>
+						<% } else { %>
+							No file present
+						<% } %>
+						</td>
+						<td><a href="/edit/editCourse/<%= obj.courseCode %>">edit</a></td>
 					</tr>
 				<% }); %>
 
