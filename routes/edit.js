@@ -365,7 +365,7 @@ router.post('/deleteCourse/:code',
 */
 router.get('/allCourses',
 	fn(async (req, res) => {
-		let courseList = await Courses.find({},'-_id');
+		let courseList = await Courses.find({});
 		courseList = courseList || [];
 		res.render('allCourses',{'courses':courseList});
 	})
@@ -480,7 +480,7 @@ router.post('/deleteTag/:tagname',
 */
 router.get(['/allTags', '/'],
 	fn(async (req, res) => {
-		let tagList = await Tags.find({},'-_id');
+		let tagList = await Tags.find({});
 		tagList = tagList || [];
 		res.render('allTags',{'tagList':tagList});
 	})

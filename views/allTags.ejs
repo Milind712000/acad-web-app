@@ -1,9 +1,9 @@
 <%include ./partials/pre-top.ejs %>
 
-<link rel="stylesheet" href="/static/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/static/css/dataTables.bootstrap4.min.css">
-<script src="/static/js/jquery.dataTables.min.js"></script>
-<script src="/static/js/dataTables.bootstrap4.min.js"></script>
+<link rel="stylesheet" href="/static/css/datatables.min.css">
+<script src="/static/js/pdfmake.min.js"></script>
+<script src="/static/js/vfs_fonts.js"></script>
+<script src="/static/js/datatables.min.js"></script>
 <script src="/static/js/allCourse.js"></script>
 
 <%include ./partials/top.ejs %>
@@ -15,7 +15,7 @@
 					<th class="text-nowrap">Tag Name</th>
 					<th>Course List</th>
 					<th>Action</th>
-					<th>Action</th>
+					<th class="deleteCol">Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -29,14 +29,10 @@
 								<% } %>
 							</td>
 							<td>
-								<form class="form-inline" action="/edit/deleteTag/<%= obj.name %>" method="POST">
-									<input type="submit" disabled aria-hidden="true" hidden>
-									<!-- "disabled first submit button" to disable submit by pressing enter-->
-									<button type="submit" class="btn btn-danger btn-sm">Delete</button>
-								</form>
+								<a href="/edit/editTag/<%= obj.name %>" class="btn btn-primary btn-sm" role="button">edit</a>
 							</td>
 							<td>
-								<a href="/edit/editTag/<%= obj.name %>" class="btn btn-primary btn-sm" role="button">edit</a>
+								<button delres="/edit/deleteTag/<%= obj.name %>" objID="<%= obj._id%>" class="btn btn-danger btn-sm delete-btn">Delete</button>
 							</td>
 					</tr>
 				<% }); %>
