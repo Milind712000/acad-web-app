@@ -14,6 +14,10 @@
 	.search-input {
 		width: -webkit-fill-available;
 	}
+	#select-all, #deselect-all {
+		margin-top: 10px;
+		margin-right: 110px;
+	}
 </style>
 
 <%include ./partials/top.ejs %>
@@ -52,6 +56,9 @@
 								<option value="<%= tagname %>"><%= tagname %></option>
 							<% }); %>
 						</select>
+
+						<a href='#' id='select-all'>select all</a>
+						<a href='#' id='deselect-all'>deselect all</a>
 					<% } else { %>
 						No Tags registered. Please add Tags.
 					<% } %>

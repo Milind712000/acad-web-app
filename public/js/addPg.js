@@ -43,4 +43,13 @@ $(document).ready( function () {
 		const currentTags = JSON.parse( currentTagAttr );
 		$('#searchable-tagSelector').multiSelect('select', currentTags);
 	}
+
+	$('#select-all').click(function(){
+		$('#searchable-tagSelector').multiSelect('select_all');
+		return false;
+	});
+	$('#deselect-all').click(function(){
+		$('#searchable-tagSelector').multiSelect('deselect_all');
+		return false;
+	});
 });
