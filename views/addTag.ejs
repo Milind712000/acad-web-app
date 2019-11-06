@@ -1,4 +1,21 @@
 <%include ./partials/pre-top.ejs %>
+
+<link rel="stylesheet" href="/static/css/multi-select.css">
+<script src="/static/js/jquery-3.3.1.slim.min.js"></script>
+<script src="/static/js/jquery.quicksearch.js"></script>
+<script src="/static/js/jquery.multi-select.js"></script>
+<script src="/static/js/addPg.js"></script>
+<style>
+	.multiselect-footer {
+		color: white;
+		background-color: black;
+		text-align: center;
+	}
+	.search-input {
+		width: -webkit-fill-available;
+	}
+</style>
+
 <%include ./partials/top.ejs %>
 
 	<form action="/edit/addTag" method="POST">
@@ -16,15 +33,17 @@
 		<div class="form-group row">
 			<div class="col-sm-3">Course List</div>
 			<div class="col-sm-9">
-				<% courseList.forEach(function(courseCode, index) { %>
-					<div class="form-check form-check-inline">
-						<label class="form-check-label">
-							<input class="form-check-input" name="courseList[]" type="checkbox" value="<%= courseCode %>">
-							<%= courseCode %>
-						</label>
-					</div>
-				<% }); %>
 				
+				<% if(courseList && courseList.length) { %>
+					<select id='searchable-tagSelector' name="courseList[]" multiple='multiple'>
+						<% courseList.forEach(function(courseCode, index) { %>
+							<option value="<%= courseCode %>"><%= courseCode %></option>
+						<% }); %>
+					</select>
+				<% } else { %>
+					No Courses registered. Please add Courses.
+				<% } %>
+
 			</div>
 		</div>
 
