@@ -64,7 +64,7 @@ const courseListValidator = async (courseCodeArray) => {
 };
 
 const archiveCategoryValidator = (cat) => {
-	if(cat !== 'calendar' && cat !== 'other' && cat !== 'timetable' && cat !== 'courselist'){
+	if(cat !== 'calendar' && cat !== 'other' && cat !== 'timetable' && cat !== 'courselist' && cat !== 'fee'){
 		throw (new Error(`Category : ${cat} is invalid`));
 	}
 	return true;

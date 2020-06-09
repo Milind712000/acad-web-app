@@ -31,8 +31,10 @@
 									<span class="badge badge-warning"> TIME TABLE </span>
 								<% } else if (obj.category === 'courselist') { %>
 									<span class="badge badge-success"> COURSE LIST </span>
-								<% } else { %>
+								<% } else if (obj.category === 'calendar') { %>
 									<span class="badge badge-info"> CALENDAR </span>
+								<% } else { %>
+									<span class="badge badge-primary"> FEE </span>
 								<% } %>
 							</td>
 							<td>
